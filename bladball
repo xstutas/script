@@ -1,0 +1,64 @@
+getgenv().AutoSpamClickDetect = true -- Spam click if near other player
+getgenv().CloseRangeAttack = false -- Just move forward to the last character
+getgenv().AutoGetVelocity = true -- Automatically get the ball's velocity
+getgenv().AutoClickKeyBind = "X" -- Need the ball to be stopped
+
+local function parryBall()
+    local ball = workspace:FindFirstChild("Ball")
+    if ball then
+        local ballPosition = ball.Position
+        local playerPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+        local distance = (ballPosition - playerPosition).Magnitude
+        if distance <= 15 then
+            game:GetService("ReplicatedStorage").Events.Parry:FireServer()
+        end
+    end
+end
+
+game:GetService("RunService").Heartbeat:Connect(function()
+    if getgenv().AutoSpamClickDetect then
+        local ball = workspace:FindFirstChild("Ball")
+        if ball then
+            local ballPosition = ball.Position
+            local playerPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+            local distance = (ballPosition - playerPosition).Magnitude
+            if distance <= 15 then
+                game:GetService("ReplicatedStorage").Events.Click:FireServer()
+            end
+        end
+    end
+
+    if getgenv().CloseRangeAttack then
+        local ball = workspace:FindFirstChild("Ball")
+        if ball then
+            local ballPosition = ball.Position
+            local playerPosition = game.Players.LocalPlayer.Character.HumanoidRootPart.Position
+            local distance = (ballPosition - playerPosition).Magnitude
+            if distance <= 15 then
+                game.Players.LocalPlayer.Character.HumanoidRootPart.CFrame =
+                    CFrame.new(ballPosition + Vector3.new(0, 0, 5))
+            end
+        end
+    end
+
+    if getgenv().AutoGetVelocity then
+        local ball = workspace:FindFirstChild("Ball")
+        if ball then
+            local velocity = ball.Velocity.Magnitude
+            if velocity == 0 then
+                game:GetService("ReplicatedStorage").Events.Click:FireServer()
+                wait(0.1)
+                parryBall()
+            end
+        end
+    end
+
+    if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode[getgenv().AutoClickKeyBind]) then
+        local ball = workspace:FindFirstChild("Ball")
+        if ball then
+            local velocity = ball.Velocity.Magnitude
+            if velocity == 0 then game:GetService("ReplicatedStorage").Events.Click:FireServer() end
+        end
+    end
+
+end)
